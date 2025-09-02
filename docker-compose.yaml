@@ -1,0 +1,48 @@
+services:
+
+  postgres-db:
+    image: 'postgres:latest'
+    restart: always
+    environment:
+      POSTGRES_USER: development
+      POSTGRES_PASSWORD: development
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: quarkus-tutorial-db
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - '5434:5432'
+    networks:
+      - quarkus-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: admin@password
+    ports:
+      - '15434:80'
+    depends_on:
+      - postgres-db
+    networks:
+      - quarkus-network
+
+  localstack:
+    image: localstack/localstack:2.3
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+      - DATA_DIR=/tmp/localstack/data
+      - DEBUG=1
+    volumes:
+      - "./localstack-data:/tmp/localstack/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  quarkus-network:
+    driver: bridge
