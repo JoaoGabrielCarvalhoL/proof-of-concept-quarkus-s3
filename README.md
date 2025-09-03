@@ -6,45 +6,38 @@ Este projeto demonstra a integração do **Quarkus** com **Amazon S3**, utilizan
 >
 > - Docker instalado. ([Instalação oficial](https://docs.docker.com/engine/install/))
 > - AWS CLI instalado. ([Instalação oficial](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
-
+> - Local Stack. ([Instalação_oficial](https://docs.localstack.cloud/aws/getting-started/installation/))
 ---
 
 ## 1. Configuração do ambiente
 
-Defina as variáveis de ambiente para que o AWS CLI consiga se autenticar com o LocalStack.
+Configurar credentials aws
 
-**Windows (PowerShell):**
-
-```powershell
-$env:AWS_ACCESS_KEY_ID="test"
-$env:AWS_SECRET_ACCESS_KEY="test"
-$env:AWS_DEFAULT_REGION="us-east-1"
-
+**aws configure:**
 ```
-
-**Linux (bash):**
-```Linux
-export AWS_ACCESS_KEY_ID=test
-export AWS_SECRET_ACCESS_KEY=test
-export AWS_DEFAULT_REGION=us-east-1
-
+aws configure --profile localstack
 ```
+- Preencher com informações fake.
 
 **Criar bucket:**
 ```
-aws --endpoint-url=http://localhost:4566 s3 mb s3://my-s3
+aws --endpoint http://localhost:4566 --profile localstack s3 mb s3://joaocruz
 
 ```
 
 **Verificar se foi o bucket foi criado:**
 ```
-aws --endpoint-url=http://localhost:4566 s3 ls
+aws --endpoint http://localhost:4566 --profile localstack s3 ls
 ```
 
 **Executando docker compose:**
 ````
 docker compose up
 ````
+- Observação: Na raiz do projeto consta um docker-compose.yaml referente ao postgres e ao pgAdmin. É necessário que esses serviços estejam funcionando para que a aplicação consiga inicializar. 
+- Dentro do diretório localstack, consta o docker-compose-yaml referente ao localstack. No meu caso, inicializei via docker compose. Caso tenha instalado na sua máquina, não é necessário inicializar. Contudo, garanta que o serviço esteja funcionando. 
+- Se optar subir através do docker compose, certifique-se de subir manualmente. 
+- Por padrão, o docker executará o docker-compose contido na raiz do projeto.
 
 **Executando projeto:**
 Projeto está configurado para executar na porta 9090
@@ -61,23 +54,3 @@ http://localhost:9090/q/dev-ui/quarkus-smallrye-openapi/swagger-ui
 ````
 http://localhost:15434/browser/
 ````
-
-# Problemas ainda não resolvidos: 
-## Incompatibilidade SDK/CLI x LocalStack
-
-Ao integrar S3 com **LocalStack**, alguns comportamentos podem gerar erros inesperados devido a incompatibilidades:
-
-### 1. AWS SDK v2 (Java)
-
-- Por padrão, o **SDK AWS v2** envia headers de **checksum e trailers** (ex: `x-amz-checksum-crc32`, `x-amz-trailer`) para otimizar uploads.
-- LocalStack (versões 2.x e algumas 3.x) **não suporta esses headers**.
-- Isso pode gerar erros como:
-- Value for x-amz-checksum-crc32 header is invalid
-
-### 2. AWS CLI moderno (v2)
-
-- O **AWS CLI v2** também envia automaticamente trailers e faz validação de checksum.
-- Ao tentar `aws s3 cp` para o LocalStack 2.x, mesmo arquivos pequenos podem falhar com:
-- InvalidRequest: The value specified in the x-amz-trailer header is not supported
-
-

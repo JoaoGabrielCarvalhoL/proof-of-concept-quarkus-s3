@@ -36,7 +36,7 @@ public class S3Service {
                 .endpointOverride(URI.create("http://127.0.0.1:4566"))
                 .region(Region.US_EAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("test", "test")))
+                        AwsBasicCredentials.create("key", "key")))
                 .build();
     }
 

@@ -28,21 +28,6 @@ services:
     networks:
       - quarkus-network
 
-  localstack:
-    image: localstack/localstack:2.3
-    container_name: localstack
-    ports:
-      - "4566:4566"
-      - "4571:4571"
-    environment:
-      - SERVICES=s3
-      - DEFAULT_REGION=us-east-1
-      - DATA_DIR=/tmp/localstack/data
-      - DEBUG=1
-    volumes:
-      - "./localstack-data:/tmp/localstack/data"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
 networks:
   quarkus-network:
     driver: bridge
